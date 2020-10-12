@@ -1,19 +1,23 @@
 {
-  "name": "@vinodpatidar123/vcli",
+  "name": "@vinodpatidar/vcli",
   "version": "1.0.0",
   "description": "First cli tool",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "bin": {
-    "vcli": "bin/vcli"
-  },
+  "bin": "bin/vcli",
   "keywords": [
     "cli",
     "create-project",
     "vcli"
   ],
+  "repository": {
+    "url": "git@github.com:vinodpatidar123/vcli.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "bin/",
     "src/",
