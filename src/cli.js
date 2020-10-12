@@ -1,6 +1,7 @@
 import arg from 'arg';
 import inquirer from 'inquirer';
 import { createProject } from './main';
+import { postProjectCreated } from './postProjectCreated';
 
 function parseArgumentsIntoOptions(rawArgs) {
  const args = arg(
@@ -8,6 +9,7 @@ function parseArgumentsIntoOptions(rawArgs) {
      '--git': Boolean,
      '--yes': Boolean,
      '--install': Boolean,
+     '--targetDir' : String,
      '-g': '--git',
      '-y': '--yes',
      '-i': '--install',
@@ -15,12 +17,13 @@ function parseArgumentsIntoOptions(rawArgs) {
    {
      argv: rawArgs.slice(2),
    }
- );
- return {
+   );
+   return {
    skipPrompts: args['--yes'] || false,
    git: args['--git'] || false,
    template: args._[0],
    runInstall: args['--install'] || false,
+   targetDir : args['--targetDir'] || false
  };
 }
 
@@ -52,18 +55,29 @@ async function promptForMissingOptions(options) {
         default: false,
       });
     }
+
+    if (!options.targetDir) {
+      questions.push({
+        name: 'targetDir',
+        message: 'Creating new project in target directory',
+        default: 'my-app',
+      });
+    }
    
     const answers = await inquirer.prompt(questions);
     return {
       ...options,
       template: options.template || answers.template,
       git: options.git || answers.git,
+      targetDir: options.targerDir || answers.targetDir
     };
    }
 
 export async function cli(args) {
     let options = parseArgumentsIntoOptions(args);
     options = await promptForMissingOptions(options);
-    await createProject(options);
-    console.log(options);
+    const projectCreated = await createProject(options);
+    if(projectCreated) {
+      await postProjectCreated(options);
+    }
 }

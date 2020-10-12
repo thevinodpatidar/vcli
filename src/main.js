@@ -12,14 +12,14 @@ const access = promisify(fs.access);
 const copy = promisify(ncp);
 
 async function copyTemplateFiles(options) {
- return copy(options.templateDirectory, options.targetDirectory, {
+ return copy(options.templateDirectory, options.targetDirectoryPath, {
    clobber: false,
  });
 }
 
 async function initGit(options) {
     const result = await execa('git', ['init'], {
-        cwd: options.targetDirectory,
+        cwd: options.targetDirectoryPath,
     });
     if (result.failed) {
         return Promise.reject(new Error('Failed to initialize git'));
@@ -27,11 +27,19 @@ async function initGit(options) {
     return;
 }
 
+async function createProjectDir(options) {
+  const result = await execa('mkdir', [options.targetDir,"-p"]);
+  if (result.failed) {
+      return Promise.reject(new Error('Failed to initialize project directory'));
+  }
+  return;
+}
+
    
 export async function createProject(options) {
  options = {
    ...options,
-   targetDirectory: options.targetDirectory || process.cwd(),
+   targetDirectoryPath: process.cwd()+`/${options.targetDir}`,
  };
 
  const currentFileUrl = import.meta.url;
@@ -51,6 +59,10 @@ export async function createProject(options) {
 
  const tasks = new Listr([
     {
+      title: 'Creating project directory',
+      task: () => createProjectDir(options),
+    },
+    {
       title: 'Copy project files',
       task: () => copyTemplateFiles(options),
     },
@@ -63,7 +75,7 @@ export async function createProject(options) {
       title: 'Install dependencies',
       task: () =>
         projectInstall({
-          cwd: options.targetDirectory,
+          cwd: options.targetDirectoryPath,
         }),
       skip: () =>
         !options.runInstall
