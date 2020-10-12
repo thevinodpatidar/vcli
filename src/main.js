@@ -72,9 +72,6 @@ export async function createProject(options) {
     },
   ]);
 
- console.log('Copy project files');
- await copyTemplateFiles(options);
-
  await tasks.run();
  console.log('%s Project ready', chalk.green.bold('DONE'));
  return true;

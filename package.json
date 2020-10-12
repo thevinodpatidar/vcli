@@ -13,6 +13,7 @@
     "vcli"
   ],
   "repository": {
+    "type": "git",
     "url": "git@github.com:vinodpatidar123/vcli.git"
   },
   "publishConfig": {
